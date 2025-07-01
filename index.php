@@ -1,0 +1,9 @@
+<?php get_header() ?>
+    <?php get_template_part('template-parts/home-parts/hero') ?>
+    <?php get_template_part('template-parts/home-parts/home-category') ?>
+    <?php get_template_part('template-parts/home-parts/popular-courses') ?>
+    <?php get_template_part('template-parts/home-parts/CTA') ?>
+    <?php get_template_part('template-parts/home-parts/faq') ?>
+    <?php get_template_part('template-parts/home-parts/testimonial') ?>
+    <?php get_template_part('template-parts/home-parts/home-blog') ?>
+<?php get_footer() ?>
