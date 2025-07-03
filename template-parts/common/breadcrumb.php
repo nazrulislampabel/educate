@@ -4,7 +4,7 @@
 		<img src="<?php echo get_template_directory_uri();?>/assets/images/breadcrumbs/1.jpg" alt="Breadcrumbs Image">
 	</div>
 	<div class="breadcrumbs-text">
-		<h1 class="page-title"><?php the_title() ?></h1>
+		<h1 class="page-title"><?php wp_title() ?></h1>
         <?php if(function_exists('bcn_display_list')) : ?>
             <ul>
                 <?php bcn_display_list(); ?>

@@ -1,6 +1,7 @@
 <?php
 require_once( get_theme_file_path( "/inc/tgm.php" ) );
 require_once( get_theme_file_path( "/inc/cmb2-metabox.php" ) );
+require_once( get_theme_file_path( "/inc/cpt-ui.php" ) );
 //require_once( get_theme_file_path( "/inc/kirki-framework.php" ));
 require_once( get_theme_file_path( "/widgets/theme-widgets.php" ));
 function educate_theme_setup(){
@@ -9,6 +10,7 @@ function educate_theme_setup(){
     add_theme_support("title-tag");
     add_theme_support("title-tag");
     add_theme_support( 'automatic-feed-links' );
+    add_theme_support('woocommerce');
     add_theme_support( 'html5', array( 'search-form', 'comment-list' ) );
     add_theme_support( "post-formats", array( "image", "gallery", "quote", "audio", "video", "link" ) );
     add_editor_style( "/assets/css/editor-style.css" );
@@ -94,7 +96,10 @@ function educate_assets(){
     wp_enqueue_script("plugins-js", get_theme_file_uri("/assets/js/plugins.js"), array("jquery"), "1.0", true);
     wp_enqueue_script("contact-form-js", get_theme_file_uri("/assets/js/contact.form.js"), array("jquery"), "1.0", true);
     wp_enqueue_script("main-js", get_theme_file_uri("/assets/js/main.js"), array("jquery"), time(), true);
-
+    // Ajax URL লোকালাইজ করো JS-এ
+    wp_localize_script( 'educate-main', 'woocommerce_params', array(
+        'ajax_url' => admin_url( 'admin-ajax.php' )
+    ));
     // ✅ Optional: IE Support (conditional scripts)
     wp_enqueue_script("html5shiv", "https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js", null, "3.7.2", false);
     wp_script_add_data("html5shiv", "conditional", "lt IE 9");
@@ -209,3 +214,67 @@ function register_site_info_widget() {
 	register_widget('Site_Info_Widget');
 }
 add_action('widgets_init', 'register_site_info_widget');
+// filters.php তে রাখতে পারেন অথবা সরাসরি functions.php
+add_action('pre_get_posts', 'custom_product_filter');
+function custom_product_filter($query) {
+    if ( is_admin() || !$query->is_main_query() ) return;
+
+    if ( is_shop() || is_post_type_archive('product') || is_tax('product_cat') ) {
+        $meta_query = [];
+        $tax_query  = [];
+
+        if (!empty($_GET['skill'])) {
+            $meta_query[] = [
+                'key' => 'skill_level',
+                'value' => sanitize_text_field($_GET['skill']),
+                'compare' => '='
+            ];
+        }
+
+        if (!empty($_GET['price']) && $_GET['price'] === 'free') {
+            $meta_query[] = [
+                'key' => '_price',
+                'value' => '0',
+                'type' => 'NUMERIC',
+                'compare' => '='
+            ];
+        }
+
+        if (!empty($_GET['duration'])) {
+            $meta_query[] = [
+                'key' => 'duration_hours',
+                'value' => intval($_GET['duration']),
+                'type' => 'NUMERIC',
+                'compare' => '>='
+            ];
+        }
+
+        if (!empty($_GET['course'])) {
+            $tax_query[] = [
+                'taxonomy' => 'course_type',
+                'field'    => 'slug',
+                'terms'    => (array) $_GET['course']
+            ];
+        }
+
+        if (!empty($_GET['instructor'])) {
+            $tax_query[] = [
+                'taxonomy' => 'instructor',
+                'field'    => 'slug',
+                'terms'    => (array) $_GET['instructor']
+            ];
+        }
+
+        if ($meta_query) $query->set('meta_query', $meta_query);
+        if ($tax_query)  $query->set('tax_query', array_merge(['relation'=>'AND'], $tax_query));
+    }
+}
+add_action('wp_ajax_wc_ajax_filter', 'wc_ajax_filter_handler');
+add_action('wp_ajax_nopriv_wc_ajax_filter', 'wc_ajax_filter_handler');
+
+function wc_ajax_filter_handler(){
+    wc_get_template_part('loop'); // loop-product.php বা content-product.php এর ভেতরের লুপ
+    wp_die();
+}
+
+

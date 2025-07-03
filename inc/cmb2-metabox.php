@@ -244,6 +244,38 @@ add_action('cmb2_admin_init', function() {
 		'options_cb'       => 'get_course_options',
 		'show_option_none' => true,
 	) );
+    $cmb = new_cmb2_box([
+        'id' => 'product_metabox',
+        'title' => 'Product Details',
+        'object_types' => ['product'],
+        'context' => 'normal',
+        'priority' => 'high',
+        'show_names' => true,
+    ]);
+
+    $cmb->add_field([
+        'name' => 'Skill Level',
+        'id' => 'skill_level',
+        'type' => 'select',
+        'options' => [
+            'beginner' => 'Beginner',
+            'intermediate' => 'Intermediate',
+            'expert' => 'Expert',
+        ],
+    ]);
+
+    $cmb->add_field([
+        'name'    => 'Duration Hours',
+        'id'      => 'duration_hours',
+        'type'    => 'select',
+        'options' => [
+            '5'  => '5+ hours (30)',
+            '10' => '10+ hours (20)',
+            '15' => '15+ hours (5)',
+        ],
+        'default' => '5',
+        'desc'    => 'Select course duration',
+    ]);
 });
 
 function get_course_options() {

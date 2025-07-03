@@ -385,6 +385,25 @@
         $this.toggleClass('closed');
         $this.siblings('.cmb-group-content').slideToggle();
     });
+    jQuery(document).ready(function($) {
+        $('form.filter-form').on('submit', function(e) {
+            e.preventDefault();
 
+            var form = $(this);
+            var data = form.serialize();
+
+            $.ajax({
+                url: '<?php echo admin_url("admin-ajax.php"); ?>',
+                type: 'GET',
+                data: data + '&action=wc_ajax_filter',
+                beforeSend: function() {
+                    $('.course-part').html('<p>Loading...</p>');
+                },
+                success: function(response) {
+                    $('.course-part').html(response);
+                }
+            });
+        });
+    });
 
 })(jQuery);

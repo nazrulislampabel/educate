@@ -2,14 +2,16 @@
 /* Template Name: All Courses Page */
 
 get_header();
+$pagination = (get_query_var('paged')) ? get_query_var('paged'): 1 ;
 $educate_course_arg = array(
         'post_type'=>'product',
-        'posts_per_page'=>10,
+        'posts_per_page'=>3,
         'orderby'=>'meta_value_num',
         'order'=>'DESE',
+        'paged'=>$pagination,
 );
-
 $educate_courses = new WP_Query($educate_course_arg);
+$total_pages = $educate_courses -> max_num_pages;
 $courses_count = 0;
 ?>
 	<!-- Main content Start -->
@@ -21,7 +23,7 @@ $courses_count = 0;
 				<div class="row">
 					<?php get_template_part("template-parts/common/sidebar") ?>
 					<div class="col-lg-8 pr-50 md-pr-15">
-						<div class="course-search-part">
+						<div class="  course-search-part">
 							<div class="course-view-part">
 								<div class="view-icons">
 									<a href="#" class="view-grid mr-10"><i class="fa fa-th-large"></i></a>
@@ -102,11 +104,27 @@ $courses_count = 0;
                             ?>
 						</div>
 						<div class="pagination-area orange-color text-center mt-30 md-mt-0">
-							<ul class="pagination-part">
-								<li class="active"><a href="#">1</a></li>
-								<li><a href="#">2</a></li>
-								<li><a href="#">Next <i class="fa fa-long-arrow-right"></i></a></li>
-							</ul>
+							<?php
+                            if ($total_pages > 1):
+                                $current_page = max(1,get_query_var('paged'));
+                            $pagination_links = paginate_links(array(
+                                'base'      => get_pagenum_link(1) . '%_%',
+                                'format'    => 'page/%#%/',
+                                'current'   => $current_page,
+                                'total'     => $total_pages,
+                                'prev_text' => __('« Prev', 'your-textdomain'),
+                                'next_text' => __('Next »', 'your-textdomain'),
+                                'type'      => 'array',
+                            ));
+                                if (!empty($pagination_links)): ?>
+                                    <ul class="pagination-part">
+                                        <?php foreach ($pagination_links as $link): ?>
+                                            <li><?php echo $link; ?></li>
+                                        <?php endforeach; ?>
+                                    </ul>
+                                <?php endif;
+                            endif;
+                            ?>
 						</div>
 					</div>
 				</div>
