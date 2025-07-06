@@ -36,12 +36,12 @@ get_header( 'shop' );
                     <div class="course-part clearfix">
                         <?php if ( woocommerce_product_loop() ) : ?>
                             <?php while ( have_posts() ) : the_post(); global $product;
-                            $product_price = ($product->get_price_html())? : "Free";
-                            ?>
+                                $product_price = ($product->get_price_html())? : "Free";
+                                ?>
                                 <div class="courses-item<?php echo $product->get_id() % 2 == 0 ? ' right' : ''; ?>">
                                     <div class="img-part">
                                         <a href="<?php the_permalink(); ?>">
-                                            <?php echo $product->get_image(); ?>
+                                            <?php echo $product->get_image('educate_course_img'); ?>
                                         </a>
                                     </div>
                                     <div class="content-part">
@@ -81,9 +81,7 @@ get_header( 'shop' );
                             <p><?php esc_html_e( 'No products found', 'woocommerce' ); ?></p>
                         <?php endif; ?>
                     </div>
-
-                   <?php get_template_part("template-parts/common/pagination") ?>
-
+                    <?php get_template_part("template-parts/common/pagination") ?>
                 </div>
             </div>
         </div>
